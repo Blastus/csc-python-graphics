@@ -1,4 +1,11 @@
 #! /usr/bin/env python3
+
+__version__ = 2, 0, 0
+__date__ = '27 June 2015'
+__author__ = 'Stephen "Zero" Chappell <Noctis.Skytower@gmail.com>'
+__credits__ = '''Guido van Rossum, Dutch computer programmer & Python's author.
+Gregor Lingl, creator of Python's turtle module that powers this program.'''
+
 import operator
 import turtle
 
