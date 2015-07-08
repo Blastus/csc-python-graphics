@@ -1,55 +1,73 @@
 #! /usr/bin/env python3
-from tkinter import *
-from tkinter import ttk
-root = Tk()
 
-h = ttk.Scrollbar(root, orient=HORIZONTAL)
-v = ttk.Scrollbar(root, orient=VERTICAL)
-canvas = Canvas(root, scrollregion=(0, 0, 1000, 1000), yscrollcommand=v.set, xscrollcommand=h.set)
-h['command'] = canvas.xview
-v['command'] = canvas.yview
-ttk.Sizegrip(root).grid(column=1, row=1, sticky=(S,E))
+import tkinter
+import tkinter.ttk
 
-canvas.grid(column=0, row=0, sticky=(N,W,E,S))
-h.grid(column=0, row=1, sticky=(W,E))
-v.grid(column=1, row=0, sticky=(N,S))
-root.grid_columnconfigure(0, weight=1)
-root.grid_rowconfigure(0, weight=1)
 
-lastx, lasty = 0, 0
+def main():
+    tkinter.NoDefaultRoot()
+    app = Application()
+    app.mainloop()
 
-def xy(event):
-    global lastx, lasty
-    lastx, lasty = canvas.canvasx(event.x), canvas.canvasy(event.y)
 
-def setColor(newcolor):
-    global color
-    color = newcolor
-    canvas.dtag('all', 'paletteSelected')
-    canvas.itemconfigure('palette', outline='white')
-    canvas.addtag('paletteSelected', 'withtag', 'palette%s' % color)
-    canvas.itemconfigure('paletteSelected', outline='#999999')
+class Application(tkinter.Tk):
 
-def addLine(event):
-    global lastx, lasty
-    x, y = canvas.canvasx(event.x), canvas.canvasy(event.y)
-    canvas.create_line((lastx, lasty, x, y), fill=color, width=5, tags='currentline')
-    lastx, lasty = x, y
+    def __init__(self, screen_name=None, base_name=None, class_name='Tk',
+                 use_tk=1, sync=0, use=None):
+        super().__init__(screen_name, base_name, class_name, use_tk, sync, use)
+        self.__h = tkinter.ttk.Scrollbar(self, orient=tkinter.HORIZONTAL)
+        self.__v = tkinter.ttk.Scrollbar(self, orient=tkinter.VERTICAL)
+        self.__c = tkinter.Canvas(self, scrollregion=(0, 0, 1000, 1000),
+                                  xscrollcommand=self.__h.set,
+                                  yscrollcommand=self.__v.set)
+        self.__h['command'] = self.__c.xview
+        self.__v['command'] = self.__c.yview
+        self.__s = tkinter.ttk.Sizegrip(self)
+        self.__c.grid(row=0, column=0, sticky=tkinter.NSEW)
+        self.__h.grid(row=1, column=0, sticky=tkinter.EW)
+        self.__v.grid(row=0, column=1, sticky=tkinter.NS)
+        self.__s.grid(row=1, column=1, sticky=tkinter.NSEW)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        self.__last_x = self.__last_y = 0
+        self.__color = 'black'
+        self.__c.bind('<Button-1>', self.__xy)
+        self.__c.bind('<B1-Motion>', self.__add_line)
+        self.__c.bind('<B1-ButtonRelease>', self.__done_stroke)
+        handle = self.__c.create_rectangle((10, 10, 30, 30), fill='red',
+                                           tags=('palette', 'palettered'))
+        self.__c.tag_bind(handle, '<Button-1>',
+                          lambda event: self.__set_color('red'))
+        handle = self.__c.create_rectangle((10, 35, 30, 55), fill='blue',
+                                           tags=('palette', 'paletteblue'))
+        self.__c.tag_bind(handle, '<Button-1>',
+                          lambda event: self.__set_color('blue'))
+        handle = self.__c.create_rectangle((10, 60, 30, 80), fill='black',
+                                           tags=('palette', 'paletteblack',
+                                                 'palette_selected'))
+        self.__c.tag_bind(handle, '<Button-1>',
+                          lambda event: self.__set_color('black'))
+        self.__c.itemconfigure('palette', width=5)
 
-def doneStroke(event):
-    canvas.itemconfigure('currentline', width=1)        
-        
-canvas.bind("<Button-1>", xy)
-canvas.bind("<B1-Motion>", addLine)
-canvas.bind("<B1-ButtonRelease>", doneStroke)
+    def __xy(self, event):
+        self.__last_x = self.__c.canvasx(event.x)
+        self.__last_y = self.__c.canvasy(event.y)
 
-id = canvas.create_rectangle((10, 10, 30, 30), fill="red", tags=('palette', 'palettered'))
-canvas.tag_bind(id, "<Button-1>", lambda x: setColor("red"))
-id = canvas.create_rectangle((10, 35, 30, 55), fill="blue", tags=('palette', 'paletteblue'))
-canvas.tag_bind(id, "<Button-1>", lambda x: setColor("blue"))
-id = canvas.create_rectangle((10, 60, 30, 80), fill="black", tags=('palette', 'paletteblack', 'paletteSelected'))
-canvas.tag_bind(id, "<Button-1>", lambda x: setColor("black"))
+    def __set_color(self, new_color, tag='palette_selected'):
+        self.__color = new_color
+        self.__c.dtag(tkinter.ALL, tag)
+        self.__c.itemconfigure('palette', outline='white')
+        self.__c.addtag(tag, 'withtag', 'palette' + self.__color)
+        self.__c.itemconfigure(tag, outline='#999999')
 
-setColor('black')
-canvas.itemconfigure('palette', width=5)
-root.mainloop()
+    def __add_line(self, event):
+        x, y = self.__c.canvasx(event.x), self.__c.canvasy(event.y)
+        self.__c.create_line((self.__last_x, self.__last_y, x, y),
+                             fill=self.__color, width=5, tags='current_line')
+        self.__last_x, self.__last_y = x, y
+
+    def __done_stroke(self, event):
+        self.__c.itemconfigure('current_line', width=1)
+
+if __name__ == '__main__':
+    main()
