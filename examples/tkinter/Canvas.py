@@ -1,5 +1,10 @@
 #! /usr/bin/env python3
 
+__version__ = 2, 0, 0
+__date__ = '7 July 2015'
+__author__ = 'Stephen "Zero" Chappell <Noctis.Skytower@gmail.com>'
+__credits__ = 'Anonymous, whoever happened to write this code first.'
+
 import tkinter
 import tkinter.ttk
 
@@ -30,23 +35,24 @@ class Application(tkinter.Tk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
         self.__last_x = self.__last_y = 0
-        self.__color = 'black'
+        self.__color = None
         self.__c.bind('<Button-1>', self.__xy)
         self.__c.bind('<B1-Motion>', self.__add_line)
         self.__c.bind('<B1-ButtonRelease>', self.__done_stroke)
         handle = self.__c.create_rectangle((10, 10, 30, 30), fill='red',
-                                           tags=('palette', 'palettered'))
+                                           tags=('palette', 'palette_red'))
         self.__c.tag_bind(handle, '<Button-1>',
                           lambda event: self.__set_color('red'))
         handle = self.__c.create_rectangle((10, 35, 30, 55), fill='blue',
-                                           tags=('palette', 'paletteblue'))
+                                           tags=('palette', 'palette_blue'))
         self.__c.tag_bind(handle, '<Button-1>',
                           lambda event: self.__set_color('blue'))
         handle = self.__c.create_rectangle((10, 60, 30, 80), fill='black',
-                                           tags=('palette', 'paletteblack',
+                                           tags=('palette', 'palette_black',
                                                  'palette_selected'))
         self.__c.tag_bind(handle, '<Button-1>',
                           lambda event: self.__set_color('black'))
+        self.__set_color('black')
         self.__c.itemconfigure('palette', width=5)
 
     def __xy(self, event):
@@ -57,7 +63,7 @@ class Application(tkinter.Tk):
         self.__color = new_color
         self.__c.dtag(tkinter.ALL, tag)
         self.__c.itemconfigure('palette', outline='white')
-        self.__c.addtag(tag, 'withtag', 'palette' + self.__color)
+        self.__c.addtag(tag, 'withtag', 'palette_' + self.__color)
         self.__c.itemconfigure(tag, outline='#999999')
 
     def __add_line(self, event):
@@ -66,7 +72,7 @@ class Application(tkinter.Tk):
                              fill=self.__color, width=5, tags='current_line')
         self.__last_x, self.__last_y = x, y
 
-    def __done_stroke(self, event):
+    def __done_stroke(self, _):
         self.__c.itemconfigure('current_line', width=1)
 
 if __name__ == '__main__':
