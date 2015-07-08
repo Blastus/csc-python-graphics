@@ -2,9 +2,12 @@
   <dictionary name="Zero">
     <words>
       <w>bezier</w>
+      <w>boids</w>
       <w>chappell</w>
       <w>lingl</w>
+      <w>pseudocode</w>
       <w>rossum</w>
+      <w>schaub</w>
     </words>
   </dictionary>
 </component>
