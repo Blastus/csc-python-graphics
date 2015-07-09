@@ -1,5 +1,7 @@
-import tkinter as Tkinter
+#! /usr/bin/env python3
+import tkinter
 import random
+import time
 import traceback
 import physics
 
@@ -19,44 +21,46 @@ BALL_COLOR = 'red'          # COLOR OF BALLS
 FLOOR_COLOR = 'blue'        # COLOR OF FLOOR
 FORCE_COLOR = 'light green' # COLOR OF FOURCE FIELD
 
-FPS = 40                    # FRAMES PER SECOND
+FPS = 60                    # FRAMES PER SECOND
 SPEED_LIMIT = 500           # PIXELS PER SECOND
 WALL_FORCE = 500            # PIXELS PER SECOND
 GRAV_RATE = 400             # PIXELS PER SECOND
-FRIC_RATE = .8              # VELOCITY PER SECOND
+FRIC_RATE = 0.875           # VELOCITY PER SECOND
 
 ################################################################################
 
 def main():
     'Setup and start demonstration.'
     initialise()
-    Tkinter.mainloop()
+    tkinter.mainloop()
 
 def initialise():
     'Build balls and prepare GUI.'
-    global balls, x, y, screen, lock
+    global balls, x, y, screen, lock, start, frame
     balls = []
     for ball in range(BALLS):
         x = -START_SPACE if random.randint(0, 1) else START_SPACE + SCREEN_WIDTH
         y = random.randint(BALL_RADIUS, SCREEN_HEIGHT - FLOOR_SPACE - BALL_RADIUS)
         balls.append(physics.Ball(x, y, BALL_RADIUS))
-    root = Tkinter.Tk()
+    root = tkinter.Tk()
     root.resizable(False, False)
-    root.title('Ball Demo')
+    root.title('Bouncy Balls')
     x = (root.winfo_screenwidth() - SCREEN_WIDTH) / 2
     y = (root.winfo_screenheight() - SCREEN_HEIGHT) / 2
     root.geometry('%dx%d+%d+%d' % (SCREEN_WIDTH, SCREEN_HEIGHT, x, y))
     root.bind_all('<Escape>', lambda event: event.widget.quit())
     root.bind('<Configure>', move)
-    screen = Tkinter.Canvas(root, width=SCREEN_WIDTH, height=SCREEN_HEIGHT, background=BACKGROUND)
-    screen.after(int(1000 / FPS), update)
-    screen.after(int(10000 / FPS), unlock)
+    screen = tkinter.Canvas(root, width=SCREEN_WIDTH, height=SCREEN_HEIGHT, background=BACKGROUND)
+    screen.after(1000 // FPS, update)
+    screen.after(10000 // FPS, unlock)
     screen.pack()
     floor_height = SCREEN_HEIGHT - FLOOR_SPACE + 2
     screen.create_rectangle(0, 0, WALL_SPACE - 1, floor_height, fill=FORCE_COLOR)
     screen.create_rectangle(SCREEN_WIDTH - WALL_SPACE + 1, 0, SCREEN_WIDTH, floor_height, fill=FORCE_COLOR)
     screen.create_line(0, floor_height, SCREEN_WIDTH, floor_height, width=3, fill=FLOOR_COLOR)
     lock = True
+    start = time.clock()
+    frame = 1.0
 
 def move(event):
     'Simulate movement of screen.'
@@ -74,8 +78,8 @@ def move(event):
 
 def update():
     'Run physics and update screen.'
+    global frame
     try:
-        ident = screen.after(int(1000 / FPS), update)
         for mutate in wall, floor, gravity, friction, governor:
             for ball in balls:
                 mutate(ball)
@@ -92,9 +96,10 @@ def update():
             x2 = ball.pos.x + ball.rad
             y2 = ball.pos.y + ball.rad
             screen.create_oval(x1, y1, x2, y2, fill=BALL_COLOR, tag='animate')
+        frame += 1
+        screen.after(int((start + frame / FPS - time.clock()) * 1000), update)
     except:
-        screen.after_cancel(ident)
-        screen.delete(Tkinter.ALL)
+        screen.delete(tkinter.ALL)
         screen.create_text(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, text=traceback.format_exc(), font='Courier 10', fill='red', tag='animate')
 
 def wall(ball):

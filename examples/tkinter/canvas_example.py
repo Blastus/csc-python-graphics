@@ -30,6 +30,8 @@ class Application(tkinter.Tk):
         self.__color = None
         self.__setup_widgets()
         self.__create_palette()
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
         
     def __setup_widgets(self):
         self.__h['command'] = self.__c.xview
@@ -41,8 +43,6 @@ class Application(tkinter.Tk):
         self.__c.bind('<Button-1>', self.__xy)
         self.__c.bind('<B1-Motion>', self.__add_line)
         self.__c.bind('<B1-ButtonRelease>', self.__done_stroke)
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
         
     def __create_palette(self):
         change = self.__set_color
