@@ -15,6 +15,7 @@ import physics
 
 
 def main():
+    tkinter.NoDefaultRoot()
     physics_example = Example()
     physics_example.mainloop()
 
