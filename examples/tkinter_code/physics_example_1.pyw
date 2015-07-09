@@ -1,8 +1,10 @@
 #! /usr/bin/env python3
-import tkinter
+
 import random
 import time
+import tkinter
 import traceback
+
 import physics
 
 ################################################################################
