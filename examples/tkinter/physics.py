@@ -7,8 +7,7 @@ approximation of physics behind bouncing balls."""
 __version__ = 2, 0, 0
 __date__ = '7 July 2015'
 __author__ = 'Stephen "Zero" Chappell <Noctis.Skytower@gmail.com>'
-__credits__ = '''Stephen Schaub, for introducing me to programming.
-Conrad Parker, for freely providing Boids pseudocode.'''
+__credits__ = 'Stephen Schaub, for introducing me to programming.'
 
 import math
 
