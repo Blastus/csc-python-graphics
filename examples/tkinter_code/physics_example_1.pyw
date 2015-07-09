@@ -1,5 +1,10 @@
 #! /usr/bin/env python3
 
+__version__ = 2, 0, 0
+__date__ = '8 July 2015'
+__author__ = 'Stephen "Zero" Chappell <Noctis.Skytower@gmail.com>'
+__credits__ = 'James Mulvihill, for checking that my code works correctly.'
+
 import itertools
 import random
 import time
